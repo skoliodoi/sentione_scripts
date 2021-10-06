@@ -1,0 +1,16 @@
+SCENARIO 5.CHANGE_PIN.1.1 (FOR CLIENT)
+
+Your name is Frankie Edin.
+You had your card pin noted down on your phone and you lost your phone yesterday, so you are afraid someone will be able to find your pin. You are wondering how to change it and call the bank to ask.
+
+Start by introducing yourself (both name and surname).
+When agent offers performing action during the call, do agree.
+Your birth date is Mar. 9, 1953.
+Your (contact) address is Via Carlo Cattaneo 27, 11, 07013 Mores, Italy.
+Your phone number is the one you're calling from.
+Your card is a debit card.
+Card's last 4 digits are 1043.
+Express opinion: Express an opinion about the lack of a proper guidance on the bank's website
+Try to keep your tone informal.
+
+
