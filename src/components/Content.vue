@@ -94,7 +94,9 @@
 <script>
 	// import moment from 'moment'
 	import axios from "axios";
-	const { DateTime } = require("luxon");
+	import config from "../config";
+  
+  const { DateTime } = require("luxon");
 
 	import ScenarioDisplay from "./ScenarioDisplay.vue";
 	export default {
@@ -175,7 +177,7 @@
 		methods: {
 			async saveData() {
 				await axios
-					.post("http://127.0.0.1:8000/", {
+					.post(`${config.apiBaseUrl}/scripts`, {
 						script_id: this.showScriptData.id,
 						script_notes: this.notes,
 						script_finished: true,

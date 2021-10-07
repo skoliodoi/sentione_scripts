@@ -96,6 +96,7 @@
 
 <script>
 	import axios from "axios";
+  import config from '../config';
 	const { DateTime } = require("luxon");
 
 	import Navbar from "./Navbar.vue";
@@ -156,11 +157,11 @@
 				};
 				setInterval(() => {
 					update();
-					console.log("Ping!");
+					// console.log("Ping!");
 				}, 5000);
 			},
 			async updateAndPullTakenScripts() {
-				const res = axios.get("http://127.0.0.1:8000/taken_scripts", {
+				const res = axios.get(`${config.apiBaseUrl}/taken_scripts`, {
 					params: {
 						user_id: this.loggedUserData.userId,
 					},
@@ -169,7 +170,7 @@
 				this.takenScripts = response;
 			},
 			clearScript() {
-				axios.post("http://127.0.0.1:8000/taken_scripts/delete", {
+				axios.post(`${config.apiBaseUrl}/taken_scripts/delete`, {
 					user_id: this.loggedUserData.userId,
 				});
 			},
@@ -186,7 +187,7 @@
 					: (this.doneScriptCount.clientCount = 0);
 			},
 			async countScenarios() {
-				const res = axios.get("http://127.0.0.1:8000/finished");
+				const res = axios.get(`${config.apiBaseUrl}/finished`);
 				const response = (await res).data;
 				this.getInitAgentCount();
 				this.getInitClientCount();
@@ -199,7 +200,7 @@
 					) {
 						countAgents += 1;
 					}
-					console.log(countAgents);
+					// console.log(countAgents);
 					if (
 						each.caller_type == "CLIENT" &&
 						each.user_id == this.loggedUserData.userId
@@ -221,7 +222,7 @@
 			},
 			async loadData() {
 				try {
-					const res = axios.get("http://127.0.0.1:8000/");
+					const res = axios.get(`${config.apiBaseUrl}/scripts`);
 					const response = (await res).data;
 					this.serverData = response;
 					// for (const each of response) {
@@ -230,7 +231,7 @@
 					this.isLoading = false;
 				} catch (err) {
 					console.log(err.response.data);
-					console.log("Nie załadowało się!");
+					// console.log("Nie załadowało się!");
 				}
 			},
 			async reloadData(ans) {
@@ -259,7 +260,7 @@
 			async displayScript(e, bool = true) {
 				// await this.loadData();
 				this.isLoadingScript = bool;
-				const res = axios.get("http://127.0.0.1:8000/script", {
+				const res = axios.get(`${config.apiBaseUrl}/script`, {
 					params: {
 						script_name: e,
 					},

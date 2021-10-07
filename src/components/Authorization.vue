@@ -9,7 +9,7 @@
 				transform: translate(-51%, -50%);
 			"
 		>
-			<div class="ui red nag" id="fixednag">
+			<div class="ui red nag">
 				<div class="title">Ups! Coś poszło nie tak...</div>
 				<div>Chyba dane logowania się nie zgadzają!</div>
 				<i class="close icon"></i>
@@ -59,6 +59,7 @@
 
 <script>
 	import axios from "axios";
+  import config from '../config';
 
 	export default {
 		data() {
@@ -93,7 +94,7 @@
 				if (this.login == "" || this.password == "") {
 					this.error = true;
 				}
-				const res = axios.get("http://127.0.0.1:8000/users");
+				const res = axios.get(`${config.apiBaseUrl}/users`);
 				const response = (await res).data;
 				// console.log(response);
 				for (const loginData of response) {
@@ -120,7 +121,7 @@
 				this.isLoading = false;
 			},
 			wrongData() {
-				$(".ui.nag").nag({ persist: true });
+				$(".ui.nag").nag({ persist: false });
 			},
 			// async logIn() {
 			// 	this.mailIsValid = true;

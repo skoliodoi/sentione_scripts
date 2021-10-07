@@ -34,6 +34,7 @@
 
 <script>
 	import axios from "axios";
+  import config from '../config';
 
 	export default {
 		data() {
@@ -68,7 +69,7 @@
 				if (this.login == "" || this.password == "") {
 					this.error = true;
 				}
-				const res = axios.get("http://127.0.0.1:8000/users");
+				const res = axios.get(`${config.apiBaseUrl}/users`);
 				const response = (await res).data;
 				// console.log(response);
 				for (const loginData of response) {
@@ -86,7 +87,7 @@
 						localStorage.setItem("initAgentCount", loginData.agent_count);
 						this.$router.replace("/main");
 					} else {
-						console.log("Złe hasło!");
+						// console.log("Złe hasło!");
 						this.wrongData();
 						this.error = true;
 						this.loginIsValid = false;

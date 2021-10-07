@@ -104,6 +104,7 @@
 
 <script>
 	import axios from "axios";
+  import config from '../config';
 
 	import groupSelector from "./GroupSelector.vue";
 	import scriptSelector from "./ScriptSelector.vue";
@@ -170,7 +171,7 @@
 		methods: {
 			async blockScript() {
 				if (this.chosenScript != "") {
-					await axios.post("http://127.0.0.1:8000/taken_scripts/insert", {
+					await axios.post(`${config.apiBaseUrl}/taken_scripts/insert`, {
 						user_id: this.nameToDisplay.userId,
 						last_name: this.nameToDisplay.lastName,
 						first_name: this.nameToDisplay.firstName,
@@ -179,9 +180,9 @@
 				}
 			},
 			async updateTakenScripts() {
-        console.log('Working');
+        // console.log('Working');
 				if (this.chosenScript != "") {
-					await axios.post("http://127.0.0.1:8000/taken_scripts/update", {
+					await axios.post(`${config.apiBaseUrl}/taken_scripts/update`, {
 						user_id: this.nameToDisplay.userId,
 						last_name: this.nameToDisplay.lastName,
 						first_name: this.nameToDisplay.firstName,
@@ -190,7 +191,7 @@
 				}
 			},
 			clearScript() {
-				axios.post("http://127.0.0.1:8000/taken_scripts/delete", {
+				axios.post(`${config.apiBaseUrl}/taken_scripts/delete`, {
 					user_id: this.nameToDisplay.userId,
 				});
 			},
@@ -240,7 +241,7 @@
 			async checkAndSendScript() {
 				this.loadingScript = true;
 				this.clearSelection();
-				const res = axios.get("http://127.0.0.1:8000/taken_scripts");
+				const res = axios.get(`${config.apiBaseUrl}/taken_scripts`);
 				const response = (await res).data;
 				let findName = response.find((o) => o.script_name == this.chosenScript);
         let findId = response.find((o) => o.user_id == this.nameToDisplay.userId);

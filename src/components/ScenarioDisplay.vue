@@ -27,25 +27,6 @@
 				return this.scriptText;
 			},
 		},
-		methods: {
-			// async getData() {
-			// 	console.log("Waiting...");
-			// 	try {
-			// 		const res = axios.get("http://127.0.0.1:8000/");
-			// 		const response = (await res).data;
-			// 		for (const each of response) {
-			// 			let rawText = JSON.stringify(each.script).replace(
-			// 				/(\\r)*\\n/g,
-			// 				"<br>"
-			// 			);
-			// 			// let evenRawerText = JSON.parse(rawText);
-			// 			this.scriptText = JSON.parse(rawText);
-			// 		}
-			// 	} catch (err) {
-			// 		console.log(err);
-			// 	}
-			// },
-		},
 	};
 </script>
 
