@@ -187,7 +187,7 @@
 					: (this.doneScriptCount.clientCount = 0);
 			},
 			async countScenarios() {
-				const res = axios.get(`${config.apiBaseUrl}/finished`);
+				const res = axios.get(`${config.apiBaseUrl}/scripts/finished`);
 				const response = (await res).data;
 				this.getInitAgentCount();
 				this.getInitClientCount();
@@ -260,7 +260,7 @@
 			async displayScript(e, bool = true) {
 				// await this.loadData();
 				this.isLoadingScript = bool;
-				const res = axios.get(`${config.apiBaseUrl}/script`, {
+				const res = axios.get(`${config.apiBaseUrl}/scripts/chosen`, {
 					params: {
 						script_name: e,
 					},
