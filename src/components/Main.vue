@@ -1,5 +1,21 @@
 <template>
-	<div class="containbox">
+	<div class="containbox" style="position: relative">
+		<div
+      v-if="error"
+			style="
+				width: 100%;
+				height: 100%;
+				background: #f44949;
+				z-index: 10;
+				position: absolute;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			"
+		>
+			<error-message></error-message>
+		</div>
+
 		<div>
 			<navbar
 				@script="displayScript"
@@ -96,13 +112,19 @@
 
 <script>
 	import axios from "axios";
-  import config from '../config';
+	import config from "../config";
 	const { DateTime } = require("luxon");
 
 	import Navbar from "./Navbar.vue";
 	import Content from "./Content.vue";
+	import ErrorMessage from "./ErrorMesage.vue";
 
 	export default {
+		components: {
+			Navbar,
+			myContent: Content,
+			ErrorMessage,
+		},
 		props: ["userData"],
 		data() {
 			return {
@@ -117,6 +139,7 @@
 					firstName: localStorage.getItem("firstName"),
 					lastName: localStorage.getItem("lastName"),
 					userId: localStorage.getItem("userId"),
+					token: localStorage.getItem("token"),
 				},
 				takenScripts: {},
 				serverData: [],
@@ -127,6 +150,7 @@
 				scriptChosen: false,
 				mainViewKey: 0,
 				timeDate: DateTime.now().toLocaleString(DateTime.DATETIME_SHORT),
+				error: false,
 			};
 		},
 
@@ -144,6 +168,7 @@
 				localStorage.removeItem("loggedIn");
 				localStorage.removeItem("initAgentCount");
 				localStorage.removeItem("initClientCount");
+				localStorage.removeItem("token");
 			},
 			async checkTakenScripts() {
 				await this.updateAndPullTakenScripts();
@@ -161,17 +186,31 @@
 				}, 5000);
 			},
 			async updateAndPullTakenScripts() {
-				const res = axios.get(`${config.apiBaseUrl}/taken_scripts`, {
-					params: {
-						user_id: this.loggedUserData.userId,
-					},
-				});
+				const res = axios
+					.get(`${config.apiBaseUrl}/taken_scripts`, {
+						headers: {
+							Authorization: this.loggedUserData.token,
+						},
+						params: {
+							user_id: this.loggedUserData.userId,
+						},
+					})
+					.catch((err) => {
+						console.log(err);
+						this.error = true;
+						return;
+					});
 				const response = (await res).data;
 				this.takenScripts = response;
 			},
 			clearScript() {
 				axios.post(`${config.apiBaseUrl}/taken_scripts/delete`, {
-					user_id: this.loggedUserData.userId,
+					headers: {
+						Authorization: this.loggedUserData.token,
+					},
+					params: {
+						user_id: this.loggedUserData.userId,
+					},
 				});
 			},
 			getInitAgentCount() {
@@ -187,7 +226,11 @@
 					: (this.doneScriptCount.clientCount = 0);
 			},
 			async countScenarios() {
-				const res = axios.get(`${config.apiBaseUrl}/scripts/finished`);
+				const res = axios.get(`${config.apiBaseUrl}/scripts/finished`, {
+					headers: {
+						Authorization: this.loggedUserData.token,
+					},
+				});
 				const response = (await res).data;
 				this.getInitAgentCount();
 				this.getInitClientCount();
@@ -222,7 +265,11 @@
 			},
 			async loadData() {
 				try {
-					const res = axios.get(`${config.apiBaseUrl}/scripts`);
+					const res = axios.get(`${config.apiBaseUrl}/scripts`, {
+						headers: {
+							Authorization: this.loggedUserData.token,
+						},
+					});
 					const response = (await res).data;
 					this.serverData = response;
 					// for (const each of response) {
@@ -261,6 +308,9 @@
 				// await this.loadData();
 				this.isLoadingScript = bool;
 				const res = axios.get(`${config.apiBaseUrl}/scripts/chosen`, {
+					headers: {
+						Authorization: this.loggedUserData.token,
+					},
 					params: {
 						script_name: e,
 					},
@@ -288,6 +338,7 @@
 						firstName: this.loggedUserData.firstName,
 						lastName: this.loggedUserData.lastName,
 						userId: this.loggedUserData.userId,
+						token: this.loggedUserData.token,
 					};
 				}
 				this.isLoadingScript = false;
@@ -319,11 +370,6 @@
 				// }
 			},
 		},
-
-		components: {
-			Navbar,
-			myContent: Content,
-		},
 	};
 </script>
 
@@ -333,6 +379,7 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 	}
 	.box-2 {
 		width: 100%;

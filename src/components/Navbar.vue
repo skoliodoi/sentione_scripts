@@ -6,7 +6,6 @@
 			class="ui small image"
 			src="../assets/sentione-logo.png"
 			style="padding: 15px"
-			@click="reloadPage"
 		/>
 		<div
 			style="
@@ -104,7 +103,7 @@
 
 <script>
 	import axios from "axios";
-  import config from '../config';
+	import config from "../config";
 
 	import groupSelector from "./GroupSelector.vue";
 	import scriptSelector from "./ScriptSelector.vue";
@@ -171,28 +170,48 @@
 		methods: {
 			async blockScript() {
 				if (this.chosenScript != "") {
-					await axios.post(`${config.apiBaseUrl}/taken_scripts/insert`, {
-						user_id: this.nameToDisplay.userId,
-						last_name: this.nameToDisplay.lastName,
-						first_name: this.nameToDisplay.firstName,
-						script_name: this.chosenScript,
-					});
+					await axios
+						.get(`${config.apiBaseUrl}/taken_scripts/insert`, {
+							headers: {
+								Authorization: this.nameToDisplay.token,
+							},
+							params: {
+								user_id: this.nameToDisplay.userId,
+								last_name: this.nameToDisplay.lastName,
+								first_name: this.nameToDisplay.firstName,
+								script_name: this.chosenScript,
+							},
+						})
+						.catch((err) => {
+							console.log(err);
+							return;
+						});
 				}
 			},
 			async updateTakenScripts() {
-        // console.log('Working');
+				// console.log('Working');
 				if (this.chosenScript != "") {
-					await axios.post(`${config.apiBaseUrl}/taken_scripts/update`, {
-						user_id: this.nameToDisplay.userId,
-						last_name: this.nameToDisplay.lastName,
-						first_name: this.nameToDisplay.firstName,
-						script_name: this.chosenScript,
+					await axios.get(`${config.apiBaseUrl}/taken_scripts/update`, {
+						headers: {
+							Authorization: this.nameToDisplay.token,
+						},
+						params: {
+							user_id: this.nameToDisplay.userId,
+							last_name: this.nameToDisplay.lastName,
+							first_name: this.nameToDisplay.firstName,
+							script_name: this.chosenScript,
+						},
 					});
 				}
 			},
 			clearScript() {
-				axios.post(`${config.apiBaseUrl}/taken_scripts/delete`, {
-					user_id: this.nameToDisplay.userId,
+				axios.get(`${config.apiBaseUrl}/taken_scripts/delete`, {
+					headers: {
+						Authorization: this.nameToDisplay.token,
+					},
+					params: {
+						user_id: this.nameToDisplay.userId,
+					},
 				});
 			},
 			displayPopUp(val) {
@@ -213,18 +232,16 @@
 				}
 			},
 			logout() {
-        this.clearScript();
+				this.clearScript();
 				this.$router.replace("/");
 				localStorage.removeItem("firstName");
 				localStorage.removeItem("lastName");
 				localStorage.removeItem("userId");
-        localStorage.removeItem("loggedIn");
+				localStorage.removeItem("loggedIn");
 				localStorage.removeItem("initAgentCount");
 				localStorage.removeItem("initClientCount");
 			},
-			reloadPage() {
-				window.location.reload();
-			},
+
 			setSpeakerType(e) {
 				if (e == true) {
 					this.speakerType = "AGENT";
@@ -241,11 +258,20 @@
 			async checkAndSendScript() {
 				this.loadingScript = true;
 				this.clearSelection();
-				const res = axios.get(`${config.apiBaseUrl}/taken_scripts`);
+				const res = axios
+					.get(`${config.apiBaseUrl}/taken_scripts`, {
+						headers: {
+							Authorization: this.nameToDisplay.token,
+						},
+					})
+					.catch((err) => {
+						console.log(err.response.data);
+						return;
+					});
 				const response = (await res).data;
 				let findName = response.find((o) => o.script_name == this.chosenScript);
-        let findId = response.find((o) => o.user_id == this.nameToDisplay.userId);
-				if (findName) {
+				let findId = response.find((o) => o.user_id == this.nameToDisplay.userId);
+				if (findName && !findId) {
 					$("body").toast({
 						message: `Sorry, this script is currently in use by ${findName.first_name} ${findName.last_name}. Try a different script!`,
 						displayTime: 0,

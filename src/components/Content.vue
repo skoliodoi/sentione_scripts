@@ -20,7 +20,9 @@
 				"
 			>
 				<div v-if="savingData">
-					<div class="ui huge active double green text loader">Saving data...</div>
+					<div class="ui huge active double green text loader">
+						Saving data...
+					</div>
 				</div>
 				<div
 					v-else
@@ -70,13 +72,7 @@
 					<button v-if="showStatus.bool" class="ui button green disabled">
 						Script finished!
 					</button>
-					<button
-						v-else
-						class="ui button blue"
-						@click="saveData"
-					>
-						Save
-					</button>
+					<button v-else class="ui button blue" @click="saveData">Save</button>
 				</div>
 			</div>
 			<div
@@ -95,8 +91,8 @@
 	// import moment from 'moment'
 	import axios from "axios";
 	import config from "../config";
-  
-  const { DateTime } = require("luxon");
+
+	const { DateTime } = require("luxon");
 
 	import ScenarioDisplay from "./ScenarioDisplay.vue";
 	export default {
@@ -177,25 +173,38 @@
 		methods: {
 			async saveData() {
 				await axios
-					.post(`${config.apiBaseUrl}/scripts`, {
-						script_id: this.showScriptData.id,
-						script_notes: this.notes,
-						script_finished: true,
-						finish_date: this.setDateTime.date,
-						finish_time: this.setDateTime.time,
-						user_name: this.combinedName,
-						user_id: this.showScriptData.userId,
-					})
-					.then((response) => {
-						console.log(response);
-					})
-					.catch((error) => {
+					.get(`${config.apiBaseUrl}/scripts/update`, {
+						headers: {
+							Authorization: this.scriptData.token,
+						},
+						params: {
+							script_id: this.showScriptData.id,
+							script_notes: this.notes,
+							script_finished: 1,
+							finish_date: this.setDateTime.date,
+							finish_time: this.setDateTime.time,
+							user_name: this.combinedName,
+							user_id: this.showScriptData.userId,
+						},
+					}).catch((error) => {
 						console.log(error.response.data);
+            console.log(error.response.data.message)
 					});
+				// await axios
+				// 	.post(`${config.apiBaseUrl}/scripts/update`, {
+				// 			script_id: this.showScriptData.id,
+				// 			script_notes: this.notes,
+				// 			script_finished: true,
+				// 			finish_date: this.setDateTime.date,
+				// 			finish_time: this.setDateTime.time,
+				// 			user_name: this.combinedName,
+				// 			user_id: this.showScriptData.userId,
+				// 	})
+
 				this.$emit("reloadData", {
 					id: this.showScriptData.id,
 					name: this.showScriptData.name,
-          bool: false
+					bool: false,
 				});
 				this.notes = "";
 			},
@@ -209,8 +218,8 @@
 
 <style>
 	/* .visible {
-																	border: 1px solid red;
-																} */
+																				border: 1px solid red;
+																			} */
 
 	.ui.grid > .row {
 		padding-bottom: 0;

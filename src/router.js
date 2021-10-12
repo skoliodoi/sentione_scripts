@@ -7,6 +7,7 @@ import NotFound from './components/NotFound.vue';
 const routes = [
   { path: '/main', component: Main, name: 'main-page', meta: { requiresAuth: true } },
   { path: '/', component: Authorization, name: 'auth' },
+  { path: '/error', component: NotFound, name: 'not-found' },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
 ]
 

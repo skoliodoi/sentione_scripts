@@ -59,7 +59,7 @@
 
 <script>
 	import axios from "axios";
-  import config from '../config';
+	import config from "../config";
 
 	export default {
 		data() {
@@ -94,34 +94,34 @@
 				if (this.login == "" || this.password == "") {
 					this.error = true;
 				}
-				const res = axios.get(`${config.apiBaseUrl}/users`);
-				const response = (await res).data;
-				// console.log(response);
-				for (const loginData of response) {
-					// console.log(this.login);
-					// console.log(loginData.login);
-					if (
-						this.login == loginData.login &&
-						this.password == loginData.password
-					) {
-						localStorage.setItem("firstName", loginData.first_name);
-						localStorage.setItem("lastName", loginData.last_name);
-						localStorage.setItem("userId", loginData.id);
-						localStorage.setItem("loggedIn", true);
-						localStorage.setItem("initClientCount", loginData.client_count);
-						localStorage.setItem("initAgentCount", loginData.agent_count);
-						this.$router.replace("/main");
-					} else {
+				const res = axios
+					.post(`${config.apiBaseUrl}/login`, {
+						login: this.login,
+						password: this.password,
+					})
+					.catch((error) => {
+						console.log(error.response.data);
 						this.wrongData();
 						this.error = true;
 						this.loginIsValid = false;
 						this.passIsValid = false;
-					}
-				}
+            this.isLoading = false;
+					});
+				const response = (await res).data;
+				if (response.status == "success") {
+					localStorage.setItem("firstName", response.first_name);
+					localStorage.setItem("lastName", response.last_name);
+					localStorage.setItem("userId", response.id);
+					localStorage.setItem("loggedIn", true);
+					localStorage.setItem("initClientCount", response.client_count);
+					localStorage.setItem("initAgentCount", response.agent_count);
+					localStorage.setItem("token", response.api_key);
+					this.$router.replace("/main");
+				} 
 				this.isLoading = false;
 			},
 			wrongData() {
-				$(".ui.nag").nag({ persist: false });
+				$(".ui.nag").nag({ persist: true });
 			},
 			// async logIn() {
 			// 	this.mailIsValid = true;
