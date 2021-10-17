@@ -10,7 +10,7 @@
 		</div>
 		<div v-else class="centered row">
 			<div
-				class="three wide column"
+				class="three wide center aligned column"
 				style="
 					background: whitesmoke;
 					border-right: 1px solid grey;
@@ -54,7 +54,11 @@
 						</div>
 						<div style="text-align: center">{{ showDateTime.value }}</div>
 					</div>
-
+					<my-counter
+            v-if="!showStatus.bool"
+						@updateTime="updateTime"
+						@blockSaveButton="blockSaveButton"
+					></my-counter>
 					<div>
 						<div class="ui form">
 							<div class="field">
@@ -72,7 +76,14 @@
 					<button v-if="showStatus.bool" class="ui button green disabled">
 						Script finished!
 					</button>
-					<button v-else class="ui button blue" @click="saveData">Save</button>
+					<button
+						v-else
+						class="ui button blue"
+						:class="{ disabled: saveButtonBlocked }"
+						@click="saveData"
+					>
+						Save
+					</button>
 				</div>
 			</div>
 			<div
@@ -94,8 +105,14 @@
 
 	const { DateTime } = require("luxon");
 
+	import Counter from "./Counter.vue";
 	import ScenarioDisplay from "./ScenarioDisplay.vue";
 	export default {
+		components: {
+			ScenarioDisplay,
+			myCounter: Counter,
+			// Selector,
+		},
 		props: ["scriptData", "savingData", "isLoading"],
 		data() {
 			return {
@@ -103,6 +120,10 @@
 				notesFromServer: "",
 				isFinished: "",
 				finishTime: "",
+				startTime: "",
+				stopTime: "",
+				duration: "",
+				saveButtonBlocked: true,
 			};
 		},
 		computed: {
@@ -171,7 +192,20 @@
 			},
 		},
 		methods: {
+			blockSaveButton(val) {
+				this.saveButtonBlocked = val;
+			},
+			updateTime(val) {
+				console.log(val);
+				this.startTime = val.start;
+				this.stopTime = val.stop;
+				this.duration = val.duration;
+				console.log(this.startTime);
+				console.log(this.stopTime);
+				console.log(this.duration);
+			},
 			async saveData() {
+				this.saveButtonBlocked = true;
 				await axios
 					.get(`${config.apiBaseUrl}/scripts/update`, {
 						headers: {
@@ -182,13 +216,16 @@
 							script_notes: this.notes,
 							script_finished: 1,
 							finish_date: this.setDateTime.date,
-							finish_time: this.setDateTime.time,
+							start_time: this.startTime,
+							finish_time: this.stopTime,
+							duration: this.duration,
 							user_name: this.combinedName,
 							user_id: this.showScriptData.userId,
 						},
-					}).catch((error) => {
+					})
+					.catch((error) => {
 						console.log(error.response.data);
-            console.log(error.response.data.message)
+						console.log(error.response.data.message);
 					});
 				// await axios
 				// 	.post(`${config.apiBaseUrl}/scripts/update`, {
@@ -209,17 +246,13 @@
 				this.notes = "";
 			},
 		},
-		components: {
-			ScenarioDisplay,
-			// Selector,
-		},
 	};
 </script>
 
 <style>
 	/* .visible {
-																				border: 1px solid red;
-																			} */
+																									border: 1px solid red;
+																								} */
 
 	.ui.grid > .row {
 		padding-bottom: 0;

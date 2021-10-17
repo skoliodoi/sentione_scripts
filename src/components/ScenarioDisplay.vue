@@ -1,10 +1,18 @@
 <template>
-	<div class="big" style="display: flex; justify-content: center; align-items:center; height: 100%">
+	<div
+		class="big"
+		style="
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+		"
+	>
 		<div
 			class="ui card"
-			style="background: whitesmoke; width: 75%; height: 600px; padding: 20px;"
+			style="background: whitesmoke; width: 75%; height: 600px; padding: 20px"
 		>
-			<div class="content"  style="overflow-y: auto">
+			<div class="content" style="overflow-y: auto">
 				<b><div v-html="displayScript"></div></b>
 			</div>
 		</div>
@@ -14,6 +22,7 @@
 <script>
 	// import axios from "axios";
 	export default {
+
 		props: ["scriptText"],
 		data() {
 			return {};

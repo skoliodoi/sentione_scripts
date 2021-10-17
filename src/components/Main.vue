@@ -1,7 +1,7 @@
 <template>
 	<div class="containbox" style="position: relative">
 		<div
-      v-if="error"
+			v-if="error"
 			style="
 				width: 100%;
 				height: 100%;
@@ -41,12 +41,6 @@
 					v-if="scriptChosen"
 					:key="mainViewKey"
 				></my-content>
-				<!-- <div
-				v-else-if="scriptChosen == 'B'"
-				style="background: red; height: 100%"
-			>
-				Nada
-			</div> -->
 				<div
 					v-else
 					style="
@@ -204,7 +198,7 @@
 				this.takenScripts = response;
 			},
 			clearScript() {
-				axios.post(`${config.apiBaseUrl}/taken_scripts/delete`, {
+				axios.get(`${config.apiBaseUrl}/taken_scripts/delete`, {
 					headers: {
 						Authorization: this.loggedUserData.token,
 					},
@@ -293,6 +287,8 @@
 					title: "Script completed!",
 					message: "Good job!",
 				});
+        this.updateCount();
+        this.clearScript();
 				this.isSaving = false;
 				// this.mainViewKey +=1;
 			},
@@ -368,6 +364,18 @@
 				// 		};
 				// 	}
 				// }
+			},
+			updateCount() {
+				axios.get(`${config.apiBaseUrl}/users/update/count`, {
+					headers: {
+						Authorization: this.loggedUserData.token,
+					},
+					params: {
+            user_id: this.loggedUserData.userId,
+						agent_count: this.doneScriptCount.agentCount,
+						client_count: this.doneScriptCount.clientCount,
+					},
+				});
 			},
 		},
 	};

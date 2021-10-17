@@ -61,6 +61,7 @@
 	import axios from "axios";
 	import config from "../config";
 
+
 	export default {
 		data() {
 			return {
@@ -105,7 +106,7 @@
 						this.error = true;
 						this.loginIsValid = false;
 						this.passIsValid = false;
-            this.isLoading = false;
+						this.isLoading = false;
 					});
 				const response = (await res).data;
 				if (response.status == "success") {
@@ -117,7 +118,7 @@
 					localStorage.setItem("initAgentCount", response.agent_count);
 					localStorage.setItem("token", response.api_key);
 					this.$router.replace("/main");
-				} 
+				}
 				this.isLoading = false;
 			},
 			wrongData() {
