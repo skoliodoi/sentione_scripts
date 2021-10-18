@@ -40,6 +40,7 @@
 					:isLoading="isLoadingScript"
 					v-if="scriptChosen"
 					:key="mainViewKey"
+          ref="content"
 				></my-content>
 				<div
 					v-else
@@ -145,14 +146,18 @@
 				mainViewKey: 0,
 				timeDate: DateTime.now().toLocaleString(DateTime.DATETIME_SHORT),
 				error: false,
+        blockSave: true
 			};
 		},
-
 		mounted() {
 			this.getData(true);
 			window.addEventListener("beforeunload", this.logout);
 		},
 		methods: {
+      blockButton() {
+        // this.blockSave = val;
+        this.mainViewKey +=1;
+      },
 			logout() {
 				this.clearScript();
 				this.$router.replace("/");
@@ -337,33 +342,8 @@
 						token: this.loggedUserData.token,
 					};
 				}
+        this.blockButton()
 				this.isLoadingScript = false;
-				// console.log(response);
-				// for (const scriptObj of this.serverData) {
-				// 	if (scriptObj.script_name == e) {
-				// 		let rawText = JSON.stringify(scriptObj.script).replace(
-				// 			/(\\r)*\\n/g,
-				// 			"<br>"
-				// 		);
-				// 		this.scriptChosen = "A";
-				// 		this.scriptText = JSON.parse(rawText);
-				// 		this.scriptData = {
-				// 			id: scriptObj.id,
-				// 			name: scriptObj.script_name,
-				// 			script: this.scriptText,
-				// 			notes: scriptObj.notes,
-				// 			type: scriptObj.caller_type,
-				// 			updateTime: scriptObj.update_time,
-				// 			userName: scriptObj.user_name,
-				// 			isFinished: scriptObj.script_finished,
-				// 			finishDate: scriptObj.finish_date,
-				// 			finishTime: scriptObj.finish_time,
-				// 			firstName: this.loggedUserData.firstName,
-				// 			lastName: this.loggedUserData.lastName,
-				// 			userId: this.loggedUserData.userId,
-				// 		};
-				// 	}
-				// }
 			},
 			updateCount() {
 				axios.get(`${config.apiBaseUrl}/users/update/count`, {

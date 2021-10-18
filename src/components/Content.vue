@@ -55,7 +55,7 @@
 						<div style="text-align: center">{{ showDateTime.value }}</div>
 					</div>
 					<my-counter
-            v-if="!showStatus.bool"
+						v-if="!showStatus.bool"
 						@updateTime="updateTime"
 						@blockSaveButton="blockSaveButton"
 					></my-counter>
@@ -127,6 +127,9 @@
 			};
 		},
 		computed: {
+			checkBlock() {
+				return this.saveButtonBlocked;
+			},
 			combinedName() {
 				return `${this.scriptData.firstName} ${this.scriptData.lastName}`;
 			},
@@ -163,7 +166,6 @@
 				} else {
 					return { bool: false };
 				}
-				// return "Szymon";
 			},
 			setDateTime() {
 				const dt = DateTime.now();
@@ -196,13 +198,9 @@
 				this.saveButtonBlocked = val;
 			},
 			updateTime(val) {
-				console.log(val);
 				this.startTime = val.start;
 				this.stopTime = val.stop;
 				this.duration = val.duration;
-				console.log(this.startTime);
-				console.log(this.stopTime);
-				console.log(this.duration);
 			},
 			async saveData() {
 				this.saveButtonBlocked = true;
@@ -227,16 +225,6 @@
 						console.log(error.response.data);
 						console.log(error.response.data.message);
 					});
-				// await axios
-				// 	.post(`${config.apiBaseUrl}/scripts/update`, {
-				// 			script_id: this.showScriptData.id,
-				// 			script_notes: this.notes,
-				// 			script_finished: true,
-				// 			finish_date: this.setDateTime.date,
-				// 			finish_time: this.setDateTime.time,
-				// 			user_name: this.combinedName,
-				// 			user_id: this.showScriptData.userId,
-				// 	})
 
 				this.$emit("reloadData", {
 					id: this.showScriptData.id,
@@ -251,8 +239,8 @@
 
 <style>
 	/* .visible {
-																									border: 1px solid red;
-																								} */
+																														border: 1px solid red;
+																													} */
 
 	.ui.grid > .row {
 		padding-bottom: 0;
