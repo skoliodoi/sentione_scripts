@@ -9,7 +9,7 @@
 		/>
 		<div
 			style="
-				flex: 1;
+        flex: 0.6;
 				display: flex;
 				justify-content: start;
 				align-items: center;
@@ -22,7 +22,12 @@
 				</div>
 			</div>
 		</div>
-
+		<div
+    style="flex:1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+				<div><strong>Client scripts read so far: {{scenarioCount.clientCount}}</strong> </div>
+        <div style="height: 10px"></div>
+				<div><strong>Agent scripts read so far: {{scenarioCount.agentCount}}</strong> </div>
+		</div>
 		<div
 			class="ui attached menu"
 			style="flex: 1; border: none; background: whitesmoke"
@@ -30,23 +35,18 @@
 			<div class="item center menu">
 				<div class="ui buttons">
 					<button
-						v-if="scenarioCount.agentCount < 100"
 						class="ui button"
 						:class="{
 							active: checkAgent.isAgent,
 							positive: checkAgent.isAgent,
 						}"
 						@click="
-							changeClass();
+							changeClass(true);
 							setSpeakerType(checkAgent.isAgent);
 						"
 					>
 						Agent
 					</button>
-					<div v-else ref="popupAgent" @mouseover="displayPopUp('Agent')">
-						<button class="ui red basic disabled button">Oops!</button>
-					</div>
-
 					<!-- <div class="or"></div> -->
 					<button
 						v-if="scenarioCount.clientCount < 100"
@@ -56,13 +56,13 @@
 							positive: !checkAgent.isAgent,
 						}"
 						@click="
-							changeClass();
+							changeClass(false);
 							setSpeakerType(checkAgent.isAgent);
 						"
 					>
 						Client
 					</button>
-					<div v-else ref="popup" @mouseover="displayPopUp('Client')">
+					<div v-else ref="popupClient" @mouseover="displayPopUp('Client')">
 						<button class="ui red basic disabled button">Oops!</button>
 					</div>
 				</div>
@@ -129,7 +129,7 @@
 		computed: {
 			checkAgent() {
 				if (
-					(this.scenarioCount.agentCount < 100 && this.isAgent == true) ||
+					this.isAgent == true ||
 					this.scenarioCount.clientCount > 100
 				) {
 					return {
@@ -219,14 +219,14 @@
 					$(this.$refs.popupAgent)
 						.popup({
 							title: `Sorry, no more ${val}'s scripts for you!`,
-							content: `It seems you read too many ${val}'s scripts already. Try another option, it's fun too!`,
+							content: `It seems you read too many ${val}'s scripts already. Try another option!`,
 						})
 						.popup("show");
 				} else {
-					$(this.$refs.popup)
+					$(this.$refs.popupClient)
 						.popup({
 							title: `Sorry, no more ${val}'s scripts for you!`,
-							content: `It seems you read too many ${val}'s scripts already. Try another option, it's fun too!`,
+							content: `It seems you read too many ${val}'s scripts already. Try another option!`,
 						})
 						.popup("show");
 				}
@@ -301,8 +301,8 @@
 				this.$emit("script", this.chosenScript);
 				this.chosenScript = "";
 			},
-			changeClass() {
-				this.isAgent = !this.isAgent;
+			changeClass(val) {
+				this.isAgent = val;
 				this.chosenScript = "";
 				this.clearSelection();
 			},

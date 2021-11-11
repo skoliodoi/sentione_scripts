@@ -1,6 +1,6 @@
 <template>
 	<div class="ui grid">
-		<div class="ui row">
+		<div>
 			<div class="ui center aligned column">
 				<button
 					class="ui blue button"
@@ -26,7 +26,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="ui row"></div>
+		<!-- <div class="ui row"></div> -->
 	</div>
 </template>
 

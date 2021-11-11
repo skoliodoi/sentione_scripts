@@ -17,6 +17,7 @@
 					height: 100%;
 					display: flex;
 					justify-content: center;
+					margin-left: 12px;
 				"
 			>
 				<div v-if="savingData">
@@ -42,7 +43,7 @@
 					</div>
 					<div v-if="showSpeaker.bool">
 						<div style="text-align: center">
-							<strong>Osoba przeprowadzająca rozmowę:</strong>
+							<strong>Person who read the script:</strong>
 						</div>
 						<div style="text-align: center">
 							{{ showSpeaker.value }}
@@ -54,20 +55,34 @@
 						</div>
 						<div style="text-align: center">{{ showDateTime.value }}</div>
 					</div>
-					<my-counter
-						v-if="!showStatus.bool"
-						@updateTime="updateTime"
-						@blockSaveButton="blockSaveButton"
-					></my-counter>
+					<div>
+						<!-- <my-counter
+							v-if="showCounter"
+							@updateTime="updateTime"
+							@blockSaveButton="blockSaveButton"
+						></my-counter> -->
+					</div>
+					<div style="display:flex; justify-content: center">
+						<div class="ui form" v-if="!showConvoId">
+							<div class="field">
+								<label>Conversation ID <strong style="color:red">(MANDATORY!!!)</strong></label>
+								<input v-model="conversationId" type="text" />
+							</div>
+						</div>
+            <div v-else style="word-wrap: break-word; text-align:center; width: 50%">
+              <div><strong>Conversation ID:</strong></div>
+              <div >{{ showScriptData.conversationId}}</div>
+            </div>
+					</div>
 					<div>
 						<div class="ui form">
 							<div class="field">
 								<label>Notes:</label>
 								<textarea
-									rows="25"
+									rows="15"
 									style="width: 100%; border: 1px solid grey"
 									v-model="notes"
-									v-if="showNotes"
+									v-if="!showNotes"
 								></textarea>
 								<div v-else>{{ showScriptData.notes }}</div>
 							</div>
@@ -76,13 +91,8 @@
 					<button v-if="showStatus.bool" class="ui button green disabled">
 						Script finished!
 					</button>
-					<button
-						v-else
-						class="ui button blue"
-						:class="{ disabled: saveButtonBlocked }"
-						@click="saveData"
-					>
-						Save
+					<button v-else class="ui button red" :class="{loading: checkIdLoading}" @click="checkConvo">
+						CLICK AFTER FINISHING THE SCRIPT
 					</button>
 				</div>
 			</div>
@@ -105,17 +115,19 @@
 
 	const { DateTime } = require("luxon");
 
-	import Counter from "./Counter.vue";
+	// import Counter from "./Counter.vue";
 	import ScenarioDisplay from "./ScenarioDisplay.vue";
 	export default {
 		components: {
 			ScenarioDisplay,
-			myCounter: Counter,
+			// myCounter: Counter,
 			// Selector,
 		},
 		props: ["scriptData", "savingData", "isLoading"],
 		data() {
 			return {
+        checkIdLoading: false,
+        conversationId: "",
 				notes: "",
 				notesFromServer: "",
 				isFinished: "",
@@ -123,13 +135,17 @@
 				startTime: "",
 				stopTime: "",
 				duration: "",
-				saveButtonBlocked: true,
+				showCounter: false,
 			};
 		},
 		computed: {
-			checkBlock() {
-				return this.saveButtonBlocked;
-			},
+      showConvoId() {
+        if (this.scriptData.conversationId) {
+          return true
+        } else {
+          return false
+        }
+      },
 			combinedName() {
 				return `${this.scriptData.firstName} ${this.scriptData.lastName}`;
 			},
@@ -155,9 +171,9 @@
 			},
 			showNotes() {
 				if (this.scriptData.notes) {
-					return false;
-				} else {
 					return true;
+				} else {
+					return false;
 				}
 			},
 			showSpeaker() {
@@ -167,15 +183,15 @@
 					return { bool: false };
 				}
 			},
-			setDateTime() {
-				const dt = DateTime.now();
-				let date = dt.toFormat("yyyy-MM-dd").toString();
-				let time = dt.toFormat("T").toString();
-				return {
-					date,
-					time,
-				};
-			},
+			// setDateTime() {
+			// 	const dt = DateTime.now();
+			// 	let date = dt.toFormat("yyyy-MM-dd").toString();
+			// 	let time = dt.toFormat("T").toString();
+			// 	return {
+			// 		date,
+			// 		time,
+			// 	};
+			// },
 			showDateTime() {
 				if (this.scriptData.finishDate) {
 					let combinedTime = `${this.scriptData.finishDate} ${this.scriptData.finishTime}`;
@@ -194,16 +210,50 @@
 			},
 		},
 		methods: {
-			blockSaveButton(val) {
-				this.saveButtonBlocked = val;
-			},
-			updateTime(val) {
-				this.startTime = val.start;
-				this.stopTime = val.stop;
-				this.duration = val.duration;
-			},
+			// blockSaveButton(val) {
+			// 	this.saveButtonBlocked = val;
+			// },
+			// updateTime(val) {
+			// 	this.startTime = val.start;
+			// 	this.stopTime = val.stop;
+			// 	this.duration = val.duration;
+			// },
+      async checkConvo() {
+        this.checkIdLoading = true;
+        const res = axios
+					.get(`${config.apiBaseUrl}/scripts/conversationid`, {
+						headers: {
+							Authorization: this.scriptData.token,
+						},
+						params: {
+              conversation_id: this.conversationId
+						},
+					})
+					.catch((error) => {
+						console.log(error.response.data);
+						console.log(error.response.data.message);
+					});
+          const response = (await res).data;
+          console.log(response)
+          let checkId = Object.keys(response).length
+        if (checkId !== 0) {
+          this.checkIdLoading = false;
+          alert('The conversation ID you provided is already in the database assigned to a different record. Please make sure that you copied a correct, unique conversation ID from Conpeek.');
+          
+        } else {
+          this.saveData();
+        }
+        this.conversationId = '';
+        
+      },
 			async saveData() {
-				this.saveButtonBlocked = true;
+        if (this.conversationId == "" || this.conversationId.length != 36) {
+          alert('The conversation ID is missing or is incorrect. Please copy the correct conversation ID from Conpeek and paste it in the required field.')
+          this.checkIdLoading = false;
+        } else {
+        const dt = DateTime.now();
+        let date = dt.toFormat("yyyy-MM-dd").toString();
+        let time = dt.toFormat("T").toString();
 				await axios
 					.get(`${config.apiBaseUrl}/scripts/update`, {
 						headers: {
@@ -211,14 +261,15 @@
 						},
 						params: {
 							script_id: this.showScriptData.id,
-							script_notes: this.notes,
+							script_notes: this.notes =="" ? "No notes provided":this.notes,
 							script_finished: 1,
-							finish_date: this.setDateTime.date,
-							start_time: this.startTime,
-							finish_time: this.stopTime,
-							duration: this.duration,
+							finish_date: date,
+							// start_time: this.startTime,
+							finish_time: time,
+							// duration: this.duration,
 							user_name: this.combinedName,
 							user_id: this.showScriptData.userId,
+              conversation_id: this.conversationId
 						},
 					})
 					.catch((error) => {
@@ -232,6 +283,9 @@
 					bool: false,
 				});
 				this.notes = "";
+        this.conversationId = "";
+        this.checkIdLoading = false;
+        }
 			},
 		},
 	};
@@ -239,8 +293,8 @@
 
 <style>
 	/* .visible {
-																														border: 1px solid red;
-																													} */
+																																	border: 1px solid red;
+																																} */
 
 	.ui.grid > .row {
 		padding-bottom: 0;

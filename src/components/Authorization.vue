@@ -10,8 +10,8 @@
 			"
 		>
 			<div class="ui red nag">
-				<div class="title">Ups! Coś poszło nie tak...</div>
-				<div>Chyba dane logowania się nie zgadzają!</div>
+				<div class="title">Oops! Something went wrong...</div>
+				<div>Try again!</div>
 				<i class="close icon"></i>
 			</div>
 			<div class="image">
@@ -29,7 +29,7 @@
 						/>
 					</div>
 					<div class="field required" :class="{ error: !passIsValid }">
-						<label>Hasło:</label>
+						<label>Password:</label>
 						<input
 							type="password"
 							name="password"
@@ -77,9 +77,9 @@
 		computed: {
 			errorText() {
 				if (this.error) {
-					return "Spróbuj ponownie!";
+					return "Try again!";
 				} else {
-					return "Zaloguj się";
+					return "Login";
 				}
 			},
 			displayError() {

@@ -154,10 +154,10 @@
 			window.addEventListener("beforeunload", this.logout);
 		},
 		methods: {
-      blockButton() {
-        // this.blockSave = val;
-        this.mainViewKey +=1;
-      },
+      // blockButton() {
+      //   // this.blockSave = val;
+      //   this.mainViewKey +=1;
+      // },
 			logout() {
 				this.clearScript();
 				this.$router.replace("/");
@@ -336,16 +336,18 @@
 						isFinished: scriptObj.script_finished,
 						finishDate: scriptObj.finish_date,
 						finishTime: scriptObj.finish_time,
+            conversationId: scriptObj.conversation_id,
 						firstName: this.loggedUserData.firstName,
 						lastName: this.loggedUserData.lastName,
 						userId: this.loggedUserData.userId,
 						token: this.loggedUserData.token,
 					};
 				}
-        this.blockButton()
+        // this.blockButton()
 				this.isLoadingScript = false;
 			},
-			updateCount() {
+			async updateCount() {
+        await this.countScenarios();
 				axios.get(`${config.apiBaseUrl}/users/update/count`, {
 					headers: {
 						Authorization: this.loggedUserData.token,
